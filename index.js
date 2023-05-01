@@ -52,29 +52,6 @@ app.use(session({
 // login: "Log In:" label / email, password inputs / submite button (if wrong: "Invalid email/password combination" shows below/ if right: to member page)
 // members: "Hello, emily" / a picture (refresh will change) / signup link to home page (session will delete)
 
-var numPageHits = 0;
-
-app.get('/', (req, res) => {
-    // if (req.session.numPageHits == null) {
-    //     req.session.numPageHits = 0;
-    // } else {
-    //     req.session.numPageHits++;
-    // }
-    // res.send(`You have visited this page ${req.session.numPageHits} times!!!!!`);
-
-    if (!req.session.authenticated) {
-        var html = `Emily's assignment 1 !!
-                    <div><a href="/createUser">Sign Up</a></div>
-                    <div><a href="/login">Log In</a></div>`;
-        res.send(html);
-        return;
-    } else {
-        var html = `Hello, ${req.session.name}!
-        <div><a href="/members">Members Area</a></div>
-        <div><a href="/logout">Log Out</a></div>`;
-    }
-});
-
 app.get('/nosql-injection', async (req, res) => {
     var username = req.query.user;
 
@@ -136,25 +113,27 @@ app.post('/submitEmail', (req, res) => {
     }
 });
 
+app.get('/', (req, res) => {
+    if (!req.session.authenticated) {
+        var html = `This is Emily's assignment 1 :D 
+                    <div><a href="/signup">Sign Up</a></div>
+                    <div><a href="/login">Log In</a></div>`;
+        res.send(html);
+        return;
+    } else {
+        var html = `Hello, ${req.session.username}!
+                    <div><a href="/members">Members Page</a></div>
+                    <div><a href="/signout">Sign Out</a></div>`;
+        res.send(html);
+    }
+});
 
-app.get('/createUser', (req, res) => {
+app.get('/signup', (req, res) => {
     var html = `
     create user
     <form action='/submitUser' method='post'>
     <input name='username' type='text' placeholder='username'>
-    <input name='password' type='password' placeholder='password'>
-    <button>Submit</button>
-    </form>
-    `;
-    res.send(html);
-});
-
-
-app.get('/login', (req, res) => {
-    var html = `
-    log in
-    <form action='/loggingin' method='post'>
-    <input name='username' type='text' placeholder='username'>
+    <input name='email' type='email' placeholder='email'>
     <input name='password' type='password' placeholder='password'>
     <button>Submit</button>
     </form>
@@ -164,99 +143,137 @@ app.get('/login', (req, res) => {
 
 app.post('/submitUser', async (req, res) => {
     var username = req.body.username;
+    var email = req.body.email;
     var password = req.body.password;
 
-    const schema = Joi.object(
-        {
-            username: Joi.string().alphanum().max(20).required(),
-            password: Joi.string().max(20).required()
-        });
+    if (!username || !email || !password) {
+        var html = `<div>${!username ? 'Please provide a valid username.' : ''}<br>
+                    ${!email ? 'Please provide a valid email.' : ''}<br>
+                    ${!password ? 'Please provide a valid password.' : ''}</div>
+                    <a href='/signup'>Go back</a>`;
+        res.send(html);
+        return;
+    }
 
-    const validationResult = schema.validate({ username, password });
+    const schema = Joi.object({
+        username: Joi.string().alphanum().max(20).required(),
+        email: Joi.string().email().max(100).required(),
+        password: Joi.string().max(20).required()
+    });
+
+    const validationResult = schema.validate({ username, email, password });
     if (validationResult.error != null) {
         console.log(validationResult.error);
-        res.redirect("/createUser");
+        res.redirect("/signup");
         return;
     }
 
     var hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    await userCollection.insertOne({ username: username, password: hashedPassword });
+    await userCollection.insertOne({ username: username, email: email, password: hashedPassword });
     console.log("Inserted user");
 
-    var html = "successfully created user";
+    req.session.authenticated = true;
+    req.session.username = username;
+    req.session.cookie.maxAge = expireTime;
+
+    res.redirect('/members');
+});
+
+app.get('/login', (req, res) => {
+    var html = `log in<form action='/loggingin' method='post'>
+                <input name='email' type='email' placeholder='email'>
+                <input name='password' type='password' placeholder='password'>
+                <button>Submit</button>
+                </form>`;
+    // if (req.query.error === 'notfound') {
+    //     html += "<p>User not found</p>";
+    // } else if (req.query.error === 'incorrect') {
+    //     html += "<p>Incorrect password</p>";
+    // }
     res.send(html);
 });
 
 app.post('/loggingin', async (req, res) => {
     var username = req.body.username;
+    var email = req.body.email;
     var password = req.body.password;
 
-    const schema = Joi.string().max(20).required();         //4. validate username again
-    const validationResult = schema.validate(username);
+    const schema = Joi.string().email().required();         //4. validate email
+    const validationResult = schema.validate(email);
     if (validationResult.error != null) {
         console.log(validationResult.error);
         res.redirect("/login");
         return;
     }
 
-    const result = await userCollection.find({ username: username }).project({ username: 1, password: 1, _id: 1 }).toArray();   //then use them in  mongoDB
+    const result = await userCollection.find({ email: email }).project({ username: 1, email: 1, password: 1, _id: 1 }).toArray();   //then use them in  mongoDB
 
     console.log(result);
+
     if (result.length != 1) {
-        console.log("user not found");
-        res.redirect("/login");
+        var html = `<div>Invalid email/password combination.</div>
+                    <br>
+                    <a href='/login'>Go back</a>`;
+        res.send(html);
         return;
     }
     if (await bcrypt.compare(password, result[0].password)) {
         console.log("correct password");
         req.session.authenticated = true;
-        req.session.username = username;
+        req.session.username = result[0].username;
         req.session.cookie.maxAge = expireTime;
 
-        res.redirect('/loggedIn');
+        res.redirect('/members');
         return;
     }
     else {
-        console.log("incorrect password");
-        res.redirect("/login");
+        var html = `<div>Invalid email/password combination.</div>
+                    <br>
+                    <a href='/login'>Go back</a>`;
+        res.send(html);
         return;
     }
 });
 
-app.get('/loggedin', (req, res) => {
+app.get('/members', (req, res) => {
     if (!req.session.authenticated) {
-        res.redirect('/login');
+        res.redirect('/');
     }
-    var html = `
-    You are logged in!
-    `;
+    var html = `Hello, ${req.session.username}!
+                <br>
+                <img src="${getRandomImage()}" style="width:500px;">
+                <br>
+                <div><a href="/signout">Sign Out</a></div>`;
     res.send(html);
+
+    function getRandomImage() {
+        const images = ['/sun.jpg', '/snow.jpg', '/lake.webp'];
+        return images[Math.floor(Math.random() * images.length)];
+      }
 });
 
-app.get('/logout', (req, res) => {
+// app.get('/view/:id', (req, res) => {
+//     var view = req.params.id;
+//     if (view == 1) {
+//         res.send("Sun: <img src='/sun.jpg' style='width:500px;'>");
+//     }
+//     else if (view == 2) {
+//         res.send("Snow: <img src='/snow.jpg' style='width:500px;'>");
+//     }
+//     else if (view == 3) {
+//         res.send("Lake: <img src='/lake.webp' style='width:500px;'>");
+//     }
+//     else {
+//         res.send("Invalid view id: " + view);
+//     }
+// });
+
+app.get('/signout', (req, res) => {
     req.session.destroy();
-    var html = `
-    You are logged out.
-    `;
-    res.send(html);
+    res.redirect('/');
 });
 
-
-app.get('/cat/:id', (req, res) => {
-
-    var cat = req.params.id;
-
-    if (cat == 1) {
-        res.send("Fluffy: <img src='/fluffy.gif' style='width:250px;'>");
-    }
-    else if (cat == 2) {
-        res.send("Socks: <img src='/socks.gif' style='width:250px;'>");
-    }
-    else {
-        res.send("Invalid cat id: " + cat);
-    }
-});
 
 app.use(express.static(__dirname + "/public"));
 
