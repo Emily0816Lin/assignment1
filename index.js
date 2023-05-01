@@ -63,7 +63,7 @@ app.get('/', (req, res) => {
     // res.send(`You have visited this page ${req.session.numPageHits} times!!!!!`);
 
     if (!req.session.authenticated) {
-        var html = `Emily's assignment 1 !
+        var html = `Emily's assignment 1 !!
                     <div><a href="/createUser">Sign Up</a></div>
                     <div><a href="/login">Log In</a></div>`;
         res.send(html);
