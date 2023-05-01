@@ -71,7 +71,7 @@ app.get('/nosql-injection', async (req, res) => {
 
 app.get('/', (req, res) => {
     if (!req.session.authenticated) {
-        var html = `This is Emily's assignment 1 :D 
+        var html = `This is Emily's assignment 1 ! :D 
                     <div><a href="/signup">Sign Up</a></div>
                     <div><a href="/login">Log In</a></div>`;
         res.send(html);
@@ -86,7 +86,7 @@ app.get('/', (req, res) => {
 
 app.get('/signup', (req, res) => {
     var html = `
-    create user
+    Create User
     <form action='/submitUser' method='post'>
     <input name='username' type='text' placeholder='username'>
     <input name='email' type='email' placeholder='email'>
