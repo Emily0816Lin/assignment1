@@ -86,7 +86,7 @@ app.get('/', (req, res) => {
 
 app.get('/signup', (req, res) => {
     var html = `
-    Create user
+    Create User
     <form action='/submitUser' method='post'>
     <input name='username' type='text' placeholder='username'>
     <input name='email' type='email' placeholder='email'>
@@ -137,8 +137,7 @@ app.post('/submitUser', async (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    var html = `Log in
-                <form action='/loggingin' method='post'>
+    var html = `log in<form action='/loggingin' method='post'>
                 <input name='email' type='email' placeholder='email'>
                 <input name='password' type='password' placeholder='password'>
                 <button>Submit</button>
@@ -152,11 +151,9 @@ app.post('/loggingin', async (req, res) => {
     var password = req.body.password;
 
     if (!email || !password) {
-        var html = `<div>
-                    ${!email ? 'Please provide a valid email.' : ''}<br>
-                    ${!password ? 'Please provide a valid password.' : ''}
-                    </div>
-                    <a href='/login'>Go back</a>`;
+        var html = `<div>${!email ? 'Please provide a valid email.' : ''}<br>
+                    ${!password ? 'Please provide a valid password.' : ''}</div>
+                    <a href='/signup'>Go back</a>`;
         res.send(html);
         return;
     }
