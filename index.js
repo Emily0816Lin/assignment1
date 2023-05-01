@@ -14,9 +14,9 @@ const app = express();
 
 const Joi = require("joi");
 
-const expireTime = 24 * 60 * 60 * 1000; //expires after 1 day  (hours * minutes * seconds * millis)
+const expireTime = 1 * 60 * 60 * 1000; // 1. expires after 1 hour  (hours * minutes * seconds * millis)
 
-/* secret information section */
+/* 2. secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
@@ -47,8 +47,22 @@ app.use(session({
 }
 ));
 
+// home page: sign up & login links
+// signup: "Sign Up:" label / name, email, password inputs / submit button (click to member page)
+// login: "Log In:" label / email, password inputs / submite button (if wrong: "Invalid email/password combination" shows below/ if right: to member page)
+// members: "Hello, emily" / a picture (refresh will change) / signup link to home page (session will delete)
+
+var numPageHits = 0;
+
 app.get('/', (req,res) => {
-    res.send("<h1>Hello World!</h1>");
+    // res.send("<h1>Hello World! :D </h1>");
+    // numPageHits++;
+    if (req.session.numPageHits == null) {
+        req.session.numPageHits = 0;
+    } else {
+        req.session.numPageHits++;
+    }
+    res.send(`You have visited this page ${req.session.numPageHits} times!!!!!`);
 });
 
 app.get('/nosql-injection', async (req,res) => {
@@ -60,10 +74,10 @@ app.get('/nosql-injection', async (req,res) => {
 	}
 	console.log("user: "+username);
 
-	const schema = Joi.string().max(20).required();
+	const schema = Joi.string().max(20).required();         //3. validate username
 	const validationResult = schema.validate(username);
 
-	//If we didn't use Joi to validate and check for a valid URL parameter below
+	// If we didn't use Joi to validate and check for a valid URL parameter below
 	// we could run our userCollection.find and it would be possible to attack.
 	// A URL parameter of user[$ne]=name would get executed as a MongoDB command
 	// and may result in revealing information about all users or a successful
@@ -168,7 +182,7 @@ app.post('/loggingin', async (req,res) => {
     var username = req.body.username;
     var password = req.body.password;
 
-	const schema = Joi.string().max(20).required();
+	const schema = Joi.string().max(20).required();         //4. validate username again
 	const validationResult = schema.validate(username);
 	if (validationResult.error != null) {
 	   console.log(validationResult.error);
@@ -176,7 +190,7 @@ app.post('/loggingin', async (req,res) => {
 	   return;
 	}
 
-	const result = await userCollection.find({username: username}).project({username: 1, password: 1, _id: 1}).toArray();
+	const result = await userCollection.find({username: username}).project({username: 1, password: 1, _id: 1}).toArray();   //then use them in  mongoDB
 
 	console.log(result);
 	if (result.length != 1) {
@@ -234,10 +248,9 @@ app.get('/cat/:id', (req,res) => {
     }
 });
 
-
 app.use(express.static(__dirname + "/public"));
 
-app.get("*", (req,res) => {
+app.get("*", (req,res) => {             //5. 404 page
 	res.status(404);
 	res.send("Page not found - 404");
 })
@@ -245,3 +258,8 @@ app.get("*", (req,res) => {
 app.listen(port, () => {
 	console.log("Node application listening on port "+port);
 }); 
+
+
+
+// 6. gitignore have env
+// 7. github doesn't have env
