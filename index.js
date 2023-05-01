@@ -1,4 +1,3 @@
-
 require("./utils.js");
 
 require('dotenv').config();
@@ -14,9 +13,8 @@ const app = express();
 
 const Joi = require("joi");
 
-const expireTime = 1 * 60 * 60 * 1000; // 1. expires after 1 hour  (hours * minutes * seconds * millis)
+const expireTime = 1 * 60 * 60 * 1000;
 
-/* 2. secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
@@ -24,7 +22,6 @@ const mongodb_database = process.env.MONGODB_DATABASE;
 const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 
 const node_session_secret = process.env.NODE_SESSION_SECRET;
-/* END secret section */
 
 var { database } = include('databaseConnection');
 
@@ -41,16 +38,11 @@ var mongoStore = MongoStore.create({
 
 app.use(session({
     secret: node_session_secret,
-    store: mongoStore, //default is memory store 
+    store: mongoStore,
     saveUninitialized: false,
     resave: true
 }
 ));
-
-// home page: sign up & login links
-// signup: "Sign Up:" label / name, email, password inputs / submit button (click to member page)
-// login: "Log In:" label / email, password inputs / submite button (if wrong: "Invalid email/password combination" shows below/ if right: to member page)
-// members: "Hello, emily" / a picture (refresh will change) / signup link to home page (session will delete)
 
 app.get('/nosql-injection', async (req, res) => {
     var username = req.query.user;
@@ -61,14 +53,9 @@ app.get('/nosql-injection', async (req, res) => {
     }
     console.log("user: " + username);
 
-    const schema = Joi.string().max(20).required();         //3. validate username
+    const schema = Joi.string().max(20).required();  
     const validationResult = schema.validate(username);
 
-    // If we didn't use Joi to validate and check for a valid URL parameter below
-    // we could run our userCollection.find and it would be possible to attack.
-    // A URL parameter of user[$ne]=name would get executed as a MongoDB command
-    // and may result in revealing information about all users or a successful
-    // login without knowing the correct password.
     if (validationResult.error != null) {
         console.log(validationResult.error);
         res.send("<h1 style='color:darkred;'>A NoSQL injection attack was detected!!</h1>");
@@ -80,37 +67,6 @@ app.get('/nosql-injection', async (req, res) => {
     console.log(result);
 
     res.send(`<h1>Hello ${username}</h1>`);
-});
-
-app.get('/about', (req, res) => {
-    var color = req.query.color;
-
-    res.send("<h1 style='color:" + color + ";'>Patrick Guichon</h1>");
-});
-
-app.get('/contact', (req, res) => {
-    var missingEmail = req.query.missing;
-    var html = `
-        email address:
-        <form action='/submitEmail' method='post'>
-            <input name='email' type='text' placeholder='email'>
-            <button>Submit</button>
-        </form>
-    `;
-    if (missingEmail) {
-        html += "<br> email is required";
-    }
-    res.send(html);
-});
-
-app.post('/submitEmail', (req, res) => {
-    var email = req.body.email;
-    if (!email) {
-        res.redirect('/contact?missing=1');
-    }
-    else {
-        res.send("Thanks for subscribing with your email: " + email);
-    }
 });
 
 app.get('/', (req, res) => {
@@ -186,11 +142,6 @@ app.get('/login', (req, res) => {
                 <input name='password' type='password' placeholder='password'>
                 <button>Submit</button>
                 </form>`;
-    // if (req.query.error === 'notfound') {
-    //     html += "<p>User not found</p>";
-    // } else if (req.query.error === 'incorrect') {
-    //     html += "<p>Incorrect password</p>";
-    // }
     res.send(html);
 });
 
@@ -199,7 +150,15 @@ app.post('/loggingin', async (req, res) => {
     var email = req.body.email;
     var password = req.body.password;
 
-    const schema = Joi.string().email().required();         //4. validate email
+    if (!email || !password) {
+        var html = `<div>${!email ? 'Please provide a valid email.' : ''}<br>
+                    ${!password ? 'Please provide a valid password.' : ''}</div>
+                    <a href='/signup'>Go back</a>`;
+        res.send(html);
+        return;
+    }
+
+    const schema = Joi.string().email().required(); 
     const validationResult = schema.validate(email);
     if (validationResult.error != null) {
         console.log(validationResult.error);
@@ -253,22 +212,6 @@ app.get('/members', (req, res) => {
       }
 });
 
-// app.get('/view/:id', (req, res) => {
-//     var view = req.params.id;
-//     if (view == 1) {
-//         res.send("Sun: <img src='/sun.jpg' style='width:500px;'>");
-//     }
-//     else if (view == 2) {
-//         res.send("Snow: <img src='/snow.jpg' style='width:500px;'>");
-//     }
-//     else if (view == 3) {
-//         res.send("Lake: <img src='/lake.webp' style='width:500px;'>");
-//     }
-//     else {
-//         res.send("Invalid view id: " + view);
-//     }
-// });
-
 app.get('/signout', (req, res) => {
     req.session.destroy();
     res.redirect('/');
@@ -277,7 +220,7 @@ app.get('/signout', (req, res) => {
 
 app.use(express.static(__dirname + "/public"));
 
-app.get("*", (req, res) => {             //5. 404 page
+app.get("*", (req, res) => { 
     res.status(404);
     res.send("Page not found - 404");
 })
@@ -285,8 +228,3 @@ app.get("*", (req, res) => {             //5. 404 page
 app.listen(port, () => {
     console.log("Node application listening on port " + port);
 });
-
-
-
-// 6. gitignore have env
-// 7. github doesn't have env
