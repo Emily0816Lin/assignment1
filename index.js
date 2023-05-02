@@ -13,8 +13,10 @@ const app = express();
 
 const Joi = require("joi");
 
+// sessions are set to expire after 1 hour
 const expireTime = 1 * 60 * 60 * 1000;
 
+// using variables from .env file
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
@@ -53,6 +55,7 @@ app.get('/nosql-injection', async (req, res) => {
     }
     console.log("user: " + username);
 
+    //validating user inputs using Joi.
     const schema = Joi.string().max(20).required();  
     const validationResult = schema.validate(username);
 
@@ -161,6 +164,7 @@ app.post('/loggingin', async (req, res) => {
         return;
     }
 
+    //validate input
     const schema = Joi.string().email().required(); 
     const validationResult = schema.validate(email);
     if (validationResult.error != null) {
@@ -223,6 +227,7 @@ app.get('/signout', (req, res) => {
 
 app.use(express.static(__dirname + "/public"));
 
+//the 404 page
 app.get("*", (req, res) => { 
     res.status(404);
     res.send("Page not found - 404");
