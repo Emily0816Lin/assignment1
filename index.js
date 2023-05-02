@@ -208,7 +208,7 @@ app.get('/members', (req, res) => {
     }
     var html = `Hello, ${req.session.username}!
                 <br>
-                <img src="${getRandomImage()}" style="width:500px;">
+                <img src="${getRandomImage()}" style="width:300px;">
                 <br>
                 <div><a href="/signout">Sign Out</a></div>`;
     res.send(html);
