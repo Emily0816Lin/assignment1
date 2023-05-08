@@ -123,8 +123,8 @@ app.get('/nosql-injection', async (req, res) => {
     res.send(`<h1>Hello ${username}</h1>`);
 });
 
-app.get('/signup', (req, res) => {
-    res.render("signup");
+app.get('/signUp', (req, res) => {
+    res.render("signUp");
 });
 
 
@@ -147,7 +147,7 @@ app.post('/submitUser', async (req, res) => {
     const validationResult = schema.validate({ username, email, password });
     if (validationResult.error != null) {
         console.log(validationResult.error);
-        res.redirect("/signup");
+        res.redirect("/signUp");
         return;
     }
 
@@ -162,6 +162,7 @@ app.post('/submitUser', async (req, res) => {
 
     res.redirect('/members');
 });
+
 
 app.get('/login', (req, res) => {
     res.render("login");
