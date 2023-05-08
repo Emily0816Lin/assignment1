@@ -57,7 +57,7 @@ function sessionValidation(req, res, next) {
         next();
     }
     else {
-        res.redirect('/login');
+        res.redirect('/');
     }
 }
 
@@ -199,7 +199,7 @@ app.post('/loggingin', async (req, res) => {
         //             </div>
         //             <a href='/login'>Go back</a>`;
         // res.send(html);
-        res.render('loggedin', {email, password});
+        res.render('loggingin', {email, password});
         return;
     }
 
@@ -220,7 +220,7 @@ app.post('/loggingin', async (req, res) => {
         //             <br>
         //             <a href='/login'>Go back</a>`;
         // res.send(html);
-        res.render('loggedin-invalid')
+        res.render('loggingin-invalid')
         return;
     }
     if (await bcrypt.compare(password, result[0].password)) {
@@ -237,22 +237,21 @@ app.post('/loggingin', async (req, res) => {
         //             <br>
         //             <a href='/login'>Go back</a>`;
         // res.send(html);
-        res.render('loggedin-invalid')
+        res.render('loggingin-invalid')
         return;
     }
 });
 
+// = loggedin page in demo
+app.use('/members', sessionValidation);
 app.get('/members', (req, res) => {
-    if (!req.session.authenticated) {
-        res.redirect('/');
-    }
+
     // var html = `Hello, ${req.session.username}!
     //             <br>
     //             <img src="${getRandomImage()}" style="width:300px;">
     //             <br>
     //             <div><a href="/signout">Sign Out</a></div>`;
     // res.send(html);
-
     res.render('members', {username: req.session.username, image: getRandomImage()});
 
     function getRandomImage() {
@@ -261,9 +260,7 @@ app.get('/members', (req, res) => {
     }
 });
 
-
-
-app.get('/admin', sessionValidation, adminAuthorization, async (req,res) => {
+app.get('/admin', sessionValidation, async (req,res) => {
     const result = await userCollection.find().project({username: 1, _id: 1}).toArray();
     res.render("admin", {users: result});
 });
