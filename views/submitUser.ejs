@@ -1,14 +1,16 @@
 <%- include("templates/header") %>
 	<div>
 		<% if (!username) { %>
-			Please provide a valid username.<br>
-		<% } %>
-		<% if (!email) { %>
-			Please provide a valid email.<br>
-		<% } %>
-			<% if (!password) { %>
-			Please provide a valid password.<br>
-		<% } %>
-	</div>
-	<a href='/signup'>Go back</a>
+            <h3 class="py-1 text-center">Please provide a valid username.</h3><br>
+        <% } %>
+        <% if (!email) { %>
+            <h3 class="py-1 text-center">Please provide a valid email.</h3><br>
+        <% } %>
+        <% if (!password) { %>
+            <h3 class="py-1 text-center">Please provide a valid password.</h3><br>
+        <% } %>
+    </div>
+	<div class="d-flex justify-content-center">
+        <a href='/login' class="btn btn-warning rounded-pill px-3" type="button">Go back</a>
+    </div>
 <%- include("templates/footer") %>

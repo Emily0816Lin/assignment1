@@ -1,7 +1,15 @@
 <%- include("templates/header") %>
-    Hello, <%= username %>!
+    <div class="text-center">
+        <h1>Hello, <%= username %>!</h1>
+        <div class="row mb-3">
+            <div class="col-md-4 themed-grid-col"><img src="lake.webp" class="img-fluid" /></div>
+            <div class="col-md-4 themed-grid-col"><img src="snow.jpg" class="img-fluid" /></div>
+            <div class="col-md-4 themed-grid-col"><img src="sun.jpg" class="img-fluid" /></div>
+        </div>
         <br>
-        <img src="<%= image %>" style="width:300px;">
         <br>
-        <div><a href="/signout">Sign Out</a></div>
+        <div>
+            <a href="/signout" class="btn btn-secondary rounded-pill px-3" type="button">Sign Out</a>
+        </div>
+    </div>
 <%- include("templates/footer") %>

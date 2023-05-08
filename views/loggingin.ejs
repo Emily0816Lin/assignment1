@@ -1,13 +1,15 @@
 <%- include("templates/header") %>
     <div>
         <% if (!email) { %>
-            Please provide a valid email.<br>
+            <h3 class="py-1 text-center">Please provide a valid email.</h3><br>
         <% } %>
         <% if (!password) { %>
-            Please provide a valid password.<br>
+            <h3 class="py-1 text-center">Please provide a valid password.</h3><br>
         <% } %>
     </div>
-    <a href='/login'>Go back</a>
+    <div class="d-flex justify-content-center">
+        <a href='/login' class="btn btn-warning rounded-pill px-3" type="button">Go back</a>
+    </div>
 <%- include("templates/footer") %>
 
 

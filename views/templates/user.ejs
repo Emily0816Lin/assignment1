@@ -1,1 +1,11 @@
-<li> <%= user.username %> </li>
+<li>
+    <h5><%= user.username %> (<%= user.user_type %>)</h5>
+    <div style="display: flex;">
+        <form method="post" action="/admin/promote/<%= user._id %>">
+            <button class="btn btn-primary rounded-pill px-3" type="submit">Promote to Admin</button>
+        </form>
+        <form method="post" action="/admin/demote/<%= user._id %>">
+            <button class="btn btn-secondary rounded-pill px-3" type="submit">Demote to User</button>
+        </form>
+    </div>
+</li>

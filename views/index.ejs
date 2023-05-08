@@ -1,11 +1,13 @@
-<%- include("templates/header") %> 
-    <% if (!authenticated ) { %>
-        This is Emily's assignment 1 ! :D 
-        <div><a href="/signup">Sign Up</a></div>
-        <div><a href="/login">Log In</a></div>
-    <% } else { %>
-        Hello, <%= username %>!
-        <div><a href="/members">Members Page</a></div>
-        <div><a href="/signout">Sign Out</a></div>
-    <% } %>
-<%- include("templates/footer") %> 
+<%- include("templates/header") %>
+    <div class="text-center">
+        <% if (!authenticated ) { %>
+            <h1>This is Emily's assignment 2 ! :D </h1>
+            <a href="/signup" class="btn btn-success rounded-pill px-3" type="button">Sign Up</a>
+            <a href="/login" class="btn btn-primary rounded-pill px-3" type="button">Log In</a>
+        <% } else { %>
+            <h1>Hello, <%= username %>!</h1>
+            <a href="/members" class="btn btn-info rounded-pill px-3" type="button">Members Page</a>
+            <a href="/signout" class="btn btn-secondary rounded-pill px-3" type="button">Sign Out</a>
+        <% } %>
+    </div>
+<%- include("templates/footer") %>
