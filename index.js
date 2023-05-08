@@ -127,6 +127,7 @@ app.get('/signup', (req, res) => {
     res.render("signup");
 });
 
+
 app.post('/submitUser', async (req, res) => {
     var username = req.body.username;
     var email = req.body.email;
