@@ -194,7 +194,7 @@ app.post('/loggingin', async (req, res) => {
 
     if (!email || !password) {
         // var html = `<div>
-        //             ${!email ? 'Please provide a valid email.' : ''}<br>
+        //             ${!email ? 'Please provide a vagit dtatuslid email.' : ''}<br>
         //             ${!password ? 'Please provide a valid password.' : ''}
         //             </div>
         //             <a href='/login'>Go back</a>`;
