@@ -37,7 +37,6 @@ app.set('view engine', 'ejs');
 
 const navLinks = [
     {name: "Home", link: "/"},
-    {name: "Login", link: "/login"},
     {name: "Members", link: "/members"},
     {name: "Admin", link: "/admin"},
     {name: "404", link: "/dne"},
