@@ -1,0 +1,14 @@
+<%- include("templates/header") %>
+	<div>
+		<% if (!username) { %>
+			Please provide a valid username.<br>
+		<% } %>
+		<% if (!email) { %>
+			Please provide a valid email.<br>
+		<% } %>
+			<% if (!password) { %>
+			Please provide a valid password.<br>
+		<% } %>
+	</div>
+	<a href='/signup'>Go back</a>
+<%- include("templates/footer") %>

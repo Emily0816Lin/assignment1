@@ -1,0 +1,11 @@
+<%- include("templates/header") %> 
+    <% if (!authenticated ) { %>
+        This is Emily's assignment 1 ! :D 
+        <div><a href="/signup">Sign Up</a></div>
+        <div><a href="/login">Log In</a></div>
+    <% } else { %>
+        Hello, <%= username %>!
+        <div><a href="/members">Members Page</a></div>
+        <div><a href="/signout">Sign Out</a></div>
+    <% } %>
+<%- include("templates/footer") %> 
